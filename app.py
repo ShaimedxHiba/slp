@@ -95,12 +95,12 @@ def main():
             color: #696969; /* Gray */
             line-height: 1.6;
         }
-        .map-container, .chart-container {
-        padding: 0;
-        margin: 0;
-    }
+        .map-container, .map-section {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
         .map-section {
-            margin-bottom: -50px; /* Adjust this to reduce space below the map */
+            margin-bottom: -20px; /* Adjust this to reduce space below the map */
         }
         </style>
         """,
@@ -118,56 +118,64 @@ def main():
     all_hubs = sorted(data['Hub'].dropna().unique())
     select_all = st.sidebar.checkbox("Select All Hubs", value=True)
 
+    # Initialize selected hubs based on the checkbox
     if select_all:
-        hubs = all_hubs
+        hubs = all_hubs  # Select all hubs by default
         cooperative_data = data
     else:
         hubs = st.sidebar.multiselect("Select Hubs", options=all_hubs, default=all_hubs)
         cooperative_data = data[data['Hub'].isin(hubs)]  # Apply filtering based on selected hubs
 
+   # Filter the dataset based on the selected hubs
     filtered_data = data[data['Hub'].isin(hubs)]
+    # Sidebar Filters
+   
+   
 
-    # Key Insights
-    st.markdown('<div class="section-title">Key Insights by Hub</div>', unsafe_allow_html=True)
+# Key Insights
+    st.markdown('<div class="section-title">Key Insights</div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         st.metric("Total Cooperatives - All Cohorts", len(data))
         total_members = data['N of Members'].sum()
         st.metric("Total Members - All Cohorts", f"{total_members:,}")
     with col2:
-        total_facebook_followers = filtered_data['Facebook followers'].sum()
-        total_instagram_followers = filtered_data['Instagram followers'].sum()
+        total_facebook_followers = data['Facebook followers'].sum()
+        total_instagram_followers = data['Instagram followers'].sum()
         st.metric("Social Media Reach - Cohorts 1,2,3", f"{total_facebook_followers + total_instagram_followers:,}")
 
     st.markdown("<br><br>", unsafe_allow_html=True)
-    # Map Visualization
-    # Map Visualization Section
-    st.markdown('<div class="section-title map-section">Geographical Reach</div>', unsafe_allow_html=True)
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    if filtered_data.empty:
-        st.write("No data available for the selected hubs.")
-    else:
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            with st.container():
-                st.markdown('<div class="map-container">', unsafe_allow_html=True)
-                st_folium(create_map(filtered_data), width=700, height=500)
-                st.markdown('</div>', unsafe_allow_html=True)
-        with col2:
-            with st.container():
-                st.markdown("### Legend")
-                for hub, color in FIXED_HUB_COLORS.items():
-                    st.markdown(
-                        f"""
-                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <div style="width: 20px; height: 20px; background-color: {color}; margin-right: 8px;"></div>
-                            <span>{hub}</span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+    
+# Map Visualization Section
+    with st.container():
+        st.markdown('<div class="section-title map-section">Geographical Reach</div>', unsafe_allow_html=True)
+        
+        if filtered_data.empty:
+            st.write("No data available for the selected hubs.")
+        else:
+            col1, col2 = st.columns([4, 1])
+            with col1:
+               
+                    st.markdown('<div class="map-container">', unsafe_allow_html=True)
+                    st_folium(create_map(filtered_data), width="100%", height=500)
+                    st.markdown('</div>', unsafe_allow_html=True)
+            with col2:
+               
+                    st.markdown("### Legend")
+                    for hub, color in FIXED_HUB_COLORS.items():
+                        st.markdown(
+                            f"""
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <div style="width: 20px; height: 20px; background-color: {color}; margin-right: 8px;"></div>
+                                <span>{hub}</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+  
+                    
 
-    # Sector Distribution Section
+# Sector Distribution Section
     st.markdown('<div class="section-title chart-container">Sector Distribution</div>', unsafe_allow_html=True)
     st.markdown("""
     This chart illustrates the distribution of cooperatives across different sectors, focusing on cohorts 1 to 3.
@@ -190,7 +198,7 @@ def main():
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Founding Age of Cooperatives</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Founding Years of Partner Cooperatives</div>', unsafe_allow_html=True)
     
     if not filtered_data.empty:
         with st.container():
@@ -213,7 +221,7 @@ def main():
             )
 
             # Set titles and labels
-            ax.set_title("Distribution of Founding Years", fontsize=14, fontweight="bold")
+           
             ax.set_xlabel("Founding Year", fontsize=12)
             ax.set_ylabel("Number of Cooperatives", fontsize=12)
 
@@ -225,16 +233,13 @@ def main():
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<br><br>", unsafe_allow_html=True)
    
-    # Case Studies Section
-    st.markdown('<div class="section-title">Success Stories</div>', unsafe_allow_html=True)
-    st.markdown("""
-    <div class="description">
-    This section highlights five successful cooperatives—Atkiss, Top Bio, Al Islah, Tighanimin, and Amagor's Amaguour Women—showcasing, that had a consistent turnover increase since the collaboration with GDF.
-    </div>
-    """, unsafe_allow_html=True)
+    # Case Studies Section - increase
+    st.markdown('<div class="section-title">Case studies - Revenue Increase</div>', unsafe_allow_html=True)
+   
+    
 
     # Filter data for the specified cooperatives
-    selected_coops = ["Atkiss", "top bio", "Al Islah", "Tighanimin", "Amagor's amaguour women"]
+    selected_coops = ["Atkiss", "top bio",  "Tighanimin", "Amagor's amaguour women",'Tagmat aziar ','Tizgui ','Tazwit Ntighanimin','Boukhedou Akermoud','Ritaj Ntighanimin ']
     case_study_data = data[data["Cooperative Name"].isin(selected_coops)]
 
         # Calculate income increases
@@ -250,8 +255,17 @@ def main():
     ).fillna(0)
 
     # Plot income evolution
+    # Plot income evolution
     with st.container():
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(10, 8))
+
+        # Define manual annotation offsets for specific cooperatives and years
+        manual_offsets = {
+            ("Boukhedou Akermoud", "2023"): (20, -10),  # Custom offset for Boukhedou Akermoud in 2023
+            ("Boukhedou Akermoud" , "2024"): (-20, 20),
+            ("Amagor's amaguour women" , "2024"): (5,-15)
+            # Add more as needed
+        }
 
         for _, row in case_study_data.iterrows():
             coop_name = row["Cooperative Name"]
@@ -271,34 +285,155 @@ def main():
             ax.plot(valid_years, valid_incomes, marker="o", label=coop_name)
 
             # Add annotations for percentage increase
-            if pd.notna(row["Increase 2023 (%)"]) and row["Increase 2023 (%)"] > 0:
-                ax.annotate(
-                    f"{row['Increase 2023 (%)']:.1f}%",
-                    xy=("2023", income_2023),
-                    xytext=(-10, 10),
-                    textcoords="offset points",
-                    fontsize=10,
-                    color="green",
-                )
-            if pd.notna(row["Increase 2024 (%)"]) and row["Increase 2024 (%)"] > 0:
-                ax.annotate(
-                    f"{row['Increase 2024 (%)']:.1f}%",
-                    xy=("2024", income_2024),
-                    xytext=(-10, 10),
-                    textcoords="offset points",
-                    fontsize=10,
-                    color="green",
-                )
+            for year, income, percentage_key in [
+                ("2023", income_2023, "Increase 2023 (%)"),
+                ("2024", income_2024, "Increase 2024 (%)"),
+            ]:
+                if pd.notna(row[percentage_key]) and row[percentage_key] > 0:
+                    # Check for manual offset, otherwise use default
+                    xytext_offset = manual_offsets.get((coop_name, year), (-20, 10))
+
+                    ax.annotate(
+                        f"{row[percentage_key]:.1f}%",
+                        xy=(year, income),
+                        xytext=xytext_offset,  # Use manual or default offset
+                        textcoords="offset points",
+                        fontsize=9,
+                        color="green",
+                        bbox=dict(boxstyle="round,pad=0.3", edgecolor="green", facecolor="white"),
+                        arrowprops=dict(arrowstyle="->", color="green", lw=0.5),
+                    )
 
         # Finalizing the plot
-        ax.set_title("Income Evolution of Selected Cooperatives (2022-2024)", fontsize=14)
+        ax.set_title("Turnover Evolution of Selected Cooperatives (2022-2024)", fontsize=14, pad=20)
         ax.set_xlabel("Year", fontsize=12)
-        ax.set_ylabel("Income", fontsize=12)
-        ax.legend(title="Cooperative Name", loc="upper left")
+        ax.set_ylabel("Turnover", fontsize=12)
+        ax.legend(title="Cooperative Name", loc="upper left", fontsize=10)
         ax.grid(True, linestyle="--", alpha=0.5)
+
+        # Adjust layout for better spacing
+        fig.tight_layout()
 
         # Display the plot in Streamlit
         st.pyplot(fig)
+
+
+
+
+
+    
+
+    # Case Studies Section - Decrease
+    st.markdown('<div class="section-title">Case studies - Revenue Decrease</div>', unsafe_allow_html=True)
+
+    # Filter data for the specified cooperatives
+    selected_coops_decrease = ["Tamo", "Ritaj Ouzoud", "Imin Tadart", "Al Oulfa", "Tifawine Angale"]
+    case_study_data_decrease = data[data["Cooperative Name"].isin(selected_coops_decrease)]
+
+    # Calculate income decreases
+    case_study_data_decrease["Decrease 2023 (%)"] = (
+        (case_study_data_decrease["Income 2023"] - case_study_data_decrease["Income 2022"])
+        / case_study_data_decrease["Income 2022"]
+        * 100
+    ).fillna(0)
+    case_study_data_decrease["Decrease 2024 (%)"] = (
+        (case_study_data_decrease["Income 2024"] - case_study_data_decrease["Income 2023"])
+        / case_study_data_decrease["Income 2023"]
+        * 100
+    ).fillna(0)
+
+   
+
+
+    # Plot income evolution for Revenue Decrease
+    # Plot income evolution for Revenue Decrease
+# Plot income evolution for Revenue Decrease
+    manual_offsets = {
+        ("Tamo", 2024): (0, 15),  # Offset for Tamo in 2023
+        ("Imin Tadart", 2024): (10, -20),  # Offset for Imin Tadart in 2024
+        ("Ritaj Ouzoud", 2024): (-30, -20),  # Offset for Ritaj Ouzoud in 2023
+        ("Al Oulfa", 2024): (-55, 5) 
+        # Add more entries as needed
+    }
+    with st.container():
+        fig, ax = plt.subplots(figsize=(10, 8))
+
+        for _, row in case_study_data_decrease.iterrows():
+            coop_name = row["Cooperative Name"]
+            income_2022 = row.get("Income 2022", None)
+            income_2023 = row.get("Income 2023", None)
+            income_2024 = row.get("Income 2024", None)
+
+            # Define years and incomes
+            years = [2022, 2023, 2024]
+            incomes = [income_2022, income_2023, income_2024]
+
+            # Filter out missing data
+            valid_data = [(year, inc) for year, inc in zip(years, incomes) if pd.notna(inc)]
+            if valid_data:
+                valid_years, valid_incomes = zip(*valid_data)
+
+                # Plot the line
+                ax.plot(valid_years, valid_incomes, marker="o", label=coop_name)
+
+                # Add annotations for percentage changes
+                for i in range(1, len(valid_years)):
+                    year_prev = valid_years[i - 1]
+                    year_curr = valid_years[i]
+                    income_prev = valid_incomes[i - 1]
+                    income_curr = valid_incomes[i]
+
+                    # Calculate percentage change
+                    if income_prev > 0:
+                        percent_change = ((income_curr - income_prev) / income_prev) * 100
+
+                        # Check for manual offset, otherwise use default
+                        xytext_offset = manual_offsets.get((coop_name, year_curr), (5, 10))  # Default offset (5, 10)
+
+                        # Annotate percentage change
+                        ax.annotate(
+                            f"{percent_change:.1f}%",
+                            xy=(year_curr, income_curr),
+                            xytext=xytext_offset,  # Use manual or default offset
+                            textcoords="offset points",
+                            fontsize=9,
+                            color="red" if percent_change < 0 else "green",  # Red for decrease, green for increase
+                            bbox=dict(boxstyle="round,pad=0.3", edgecolor="gray", facecolor="white"),
+                            arrowprops=dict(arrowstyle="->", color="gray", lw=0.5)
+                        )
+                        
+        
+
+                        # Annotate percentage change
+                        ax.annotate(
+                            f"{percent_change:.1f}%",
+                            xy=(year_curr, income_curr),
+                            xytext=xytext_offset,  # Use dynamic offset
+                            textcoords="offset points",
+                            fontsize=9,
+                            color="red" if percent_change < 0 else "green",  # Red for decrease, green for increase
+                            bbox=dict(boxstyle="round,pad=0.3", edgecolor="gray", facecolor="white"),
+                            arrowprops=dict(arrowstyle="->", color="gray", lw=0.5)
+                        )
+
+        # Finalizing the plot
+        ax.set_title("Turnover Evolution of Cooperatives with Revenue Decrease (2022-2024)", fontsize=14, pad=20)
+        ax.set_xlabel("Year", fontsize=12)
+        ax.set_ylabel("Turnover", fontsize=12)
+        ax.legend(title="Cooperative Name", loc="upper left", fontsize=10)
+        ax.grid(True, linestyle="--", alpha=0.5)
+
+        # Force numeric x-axis for proper ordering
+        ax.set_xticks([2022, 2023, 2024])  # Explicitly define x-axis ticks
+        ax.set_xticklabels([2022, 2023, 2024], fontsize=10)
+
+        # Adjust layout for better spacing
+        fig.tight_layout()
+
+        # Display the plot in Streamlit
+        st.pyplot(fig)
+
+
 
 
 # Cooperative Table
@@ -322,13 +457,15 @@ def main():
         else:
             st.dataframe(
                 filtered_cooperative_data[
-                    ['Cooperative Name', 'Cohort', 'Hub', 'N of Members', 'Activity','Facebook','Instagram']
+                    ['Cooperative Name', 'Cohort', 'Hub', 'N of Members', 'Activity','Income 2023','Income 2024','Facebook','Instagram']
                 ].rename(columns={
                     'Cooperative Name': 'Cooperative Name',
                     'Cohort': 'Cohort',
                     'Hub': 'Hub',
                     'N of Members': 'Members',
                     'Activity': 'Activity',
+                    'Income 2023':'Income 2023',
+                    'Income 2024':'Income 2024',
                     'Facebook': 'Facebook',
                     'Instagram': 'Instagram'
                 })
